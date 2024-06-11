@@ -1,5 +1,4 @@
 ﻿using ECommerce.Api.Products.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Products.Controllers
@@ -19,6 +18,17 @@ namespace ECommerce.Api.Products.Controllers
             var result = await _productProvider.GetProductsAsync();
             if (result.IsSuccess) 
             {
+                return Ok(result);
+            }
+            return NotFound();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductAsync(int id)
+        {
+            var result = await _productProvider.GetProductByIdAsync(id);
+            if (result.IsSuccess) 
+            { 
                 return Ok(result);
             }
             return NotFound();

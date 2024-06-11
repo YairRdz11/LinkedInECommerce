@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Api.Products.Db;
 using ECommerce.Api.Products.Interfaces;
+using ECommerce.Api.Products.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Products.Providers
@@ -31,24 +32,44 @@ namespace ECommerce.Api.Products.Providers
             }
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<Models.Product> Products, 
-            string ErrorMessage)> GetProductsAsync()
+        public async Task<Result<IEnumerable<Models.Product>>> GetProductsAsync()
         {
             try
             {
                 var products = await _dbContext.Products.ToListAsync();
-                if(products != null && products.Any())
+                if (products != null && products.Any())
                 {
                     var result = _mapper.Map<IEnumerable<Db.Product>, IEnumerable<Models.Product>>(products);
-                    return (true, result, null);
+                    return new Result<IEnumerable<Models.Product>> { IsSuccess = true, ResultObject = result, ErrorMessage = null };
                 }
 
-                return (false, null, "Not found");
+                return new Result<IEnumerable<Models.Product>> { IsSuccess = false, ResultObject = null, ErrorMessage = "Not Found" };
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex.ToString());
-                return (false, null, ex.Message);
+                return new Result<IEnumerable<Models.Product>> { IsSuccess = false, ResultObject = null, ErrorMessage = ex.ToString() };
+            }
+        }
+
+        public async Task<Result<Models.Product>> GetProductByIdAsync(int id)
+        {
+            try
+            {
+                var product = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (product != null)
+                {
+                    var result = _mapper.Map<Db.Product, Models.Product>(product);
+                    return new Result<Models.Product> { IsSuccess = true, ResultObject = result, ErrorMessage = null };
+                }
+
+                return new Result<Models.Product> { IsSuccess = false, ResultObject = null, ErrorMessage = "Not Found" };
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex.ToString());
+                return new Result<Models.Product>{ IsSuccess = false, ResultObject = null, ErrorMessage = ex.ToString() };
             }
         }
     }
