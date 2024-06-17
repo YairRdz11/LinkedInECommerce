@@ -35,7 +35,7 @@ namespace ECommerce.Api.Orders.Providers
                 _ordersDbContext.Orders.Add(new Db.Order
                 {
                     Id = 2,
-                    CustomerId = 3,
+                    CustomerId = 2,
                     OrderDate = DateTime.Today,
                     Total = 150,
                     Items = new List<Db.OrderItem> { new Db.OrderItem { Id = 2, ProductId = 1, Quantity = 3, UnitPrice = 50 } }

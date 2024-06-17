@@ -4,11 +4,23 @@ namespace ECommerce.Api.Search.Services
 {
     public class SearchService : ISearchService
     {
-        public async Task<(bool IsSuccess, dynamic SearchResults)> SearchAsync(int customerId)
+        private readonly IOrderService _orderService;
+        public SearchService(IOrderService orderService)
         {
-            await Task.Delay(1000);
-
-            return (true, new { Message = "Hello" });
+            _orderService = orderService;
+        }
+        public async Task<(bool IsSuccess, dynamic? SearchResults)> SearchAsync(int customerId)
+        {
+            var orderResult = await _orderService.GetOrderAsync(customerId);
+            if (orderResult.IsSuccess) 
+            { 
+                var result = new
+                {
+                    Orders = orderResult.ResultObject
+                };
+                return (true, result);
+            }
+            return (false, null);
         }
     }
 }
