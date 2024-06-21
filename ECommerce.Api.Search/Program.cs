@@ -1,6 +1,7 @@
 using ECommerce.Api.Search.Interfaces;
 using ECommerce.Api.Search.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddHttpClient("ProductsServices", config =>
 {
     string productUrl = builder.Configuration.GetSection("Services:Products").Value;
     config.BaseAddress = new Uri(productUrl);
-});
+}).AddTransientHttpErrorPolicy( p => p.WaitAndRetryAsync(5, _ => TimeSpan.FromMilliseconds(5000)));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
